@@ -16,7 +16,11 @@ namespace Directline.Controllers
     public class ConversationController : ControllerCommon
     {
         private readonly ILogger<ConversationController> _logger;
-        public ConversationController(ILogger<ConversationController> logger, IConfiguration config, IDataStorage storage) : base(config, storage)
+        public ConversationController(
+            IHttpContextAccessor httpContext,
+            ILogger<ConversationController> logger, 
+            IConfiguration config, 
+            IDataStorage storage) : base(httpContext, config, storage)
         {
             _logger = logger;
         }

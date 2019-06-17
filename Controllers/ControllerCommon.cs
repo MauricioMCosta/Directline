@@ -1,5 +1,6 @@
 ﻿using Directline.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
@@ -16,9 +17,11 @@ namespace Directline.Controllers
         public readonly IDataStorage _datastorage;
         private bool conversationInitRequired=true;
         private readonly IConfiguration _config;
+        private readonly IHttpContextAccessor _httpContext;
 
-        public ControllerCommon(IConfiguration config, IDataStorage datastorage)
+        public ControllerCommon(IHttpContextAccessor httpContext, IConfiguration config, IDataStorage datastorage)
         {
+            _httpContext=httpContext;
             _datastorage = datastorage;
             _config = config;
         }
@@ -32,7 +35,14 @@ namespace Directline.Controllers
         }
         protected string GetServiceUrl()
         {
-            return "http://localhost:52068";
+            var request = _httpContext.HttpContext.Request;
+
+            var absoluteUri = string.Concat(
+                        request.Scheme,
+                        "://",
+                        request.Host.ToUriComponent(),
+                        request.PathBase.ToUriComponent());
+            return absoluteUri;
         }
         protected Conversation GetConversation(string conversationId)
         {

@@ -15,7 +15,10 @@ namespace Directline.Controllers
     {
         private readonly ILogger<BotStateController> _logger;
 
-        public BotStateController(ILogger<BotStateController> logger,IConfiguration config, IDataStorage storage) : base(config,storage)
+        public BotStateController(IHttpContextAccessor httpContext, 
+            ILogger<BotStateController> 
+            logger,IConfiguration config, 
+            IDataStorage storage) : base(httpContext, config, storage)
         {
             _logger = logger;
         }

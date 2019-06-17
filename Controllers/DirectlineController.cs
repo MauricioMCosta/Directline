@@ -22,7 +22,11 @@ namespace Directline.Controllers
     {
         private readonly ILogger<DirectlineController> _logger;
 
-        public DirectlineController(ILogger<DirectlineController> logger, IConfiguration config, IDataStorage storage) : base(config, storage)
+        public DirectlineController(
+            IHttpContextAccessor httpContext,
+            ILogger<DirectlineController> logger, 
+            IConfiguration config, 
+            IDataStorage storage) : base(httpContext, config, storage)
         {
             _logger = logger;
         }
