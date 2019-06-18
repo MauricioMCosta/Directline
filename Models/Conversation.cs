@@ -8,11 +8,7 @@ namespace Directline.Models
         [JsonProperty("conversationId")]
         public string ConversationId { get; set; }
         [JsonProperty("expires_in")]
-        public int ExpiresIn { get; set; }
-
-        [JsonIgnore]
-        public int StatusCode { get; set; }
-        
+        public int ExpiresIn { get; set; }        
     }
 
     public class Conversation

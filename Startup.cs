@@ -33,6 +33,9 @@ namespace Directline
             services.AddSingleton<IConfiguration>(Configuration);
             services
                 .AddMvc()
+                .AddJsonOptions(options=>{
+                    options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
+                })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddSwaggerGen(c =>
             {
@@ -54,7 +57,7 @@ namespace Directline
             app.UseCors(builder => {
                 builder.AllowAnyOrigin();
                 builder.AllowAnyMethod();
-                builder.WithHeaders("Origin", "X-Requested-With", "Content-Type", "Accept", "Authorization", "x-ms-bot-agent");
+                builder.WithHeaders("Origin", "X-Requested-With", "Content-Type", "Accept", "Authorization", "x-ms-bot-agent","dnt");
             });
             app.UseHttpsRedirection();
             app.UseSwagger();

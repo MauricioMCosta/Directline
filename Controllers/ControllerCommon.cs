@@ -42,6 +42,7 @@ namespace Directline.Controllers
                         "://",
                         request.Host.ToUriComponent(),
                         request.PathBase.ToUriComponent());
+
             return absoluteUri;
         }
         protected Conversation GetConversation(string conversationId)

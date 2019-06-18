@@ -76,6 +76,7 @@ namespace Directline.Controllers
             {
                 using (var client = new HttpClient())
                 {
+                    _logger.LogInformation($"Forwarding requests to BOT at {GetBotUrl()}");
                     client.BaseAddress = new Uri(GetBotUrl());
                     client.DefaultRequestHeaders.Accept.Clear();
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));

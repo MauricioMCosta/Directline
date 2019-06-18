@@ -27,7 +27,7 @@ namespace Directline.Models
         [JsonProperty("replyToId")]
         public string ReplyToId { get; set; }
         [JsonProperty("channelData")]
-        public ChannelData ChannelData { get; set; }
+        public object ChannelData { get; set; }
         [JsonProperty("locale")]
         public string Locale { get; set; }
         [JsonProperty("text")]
@@ -50,6 +50,10 @@ namespace Directline.Models
         public string TopicName { get; set; }
         [JsonProperty("historyDisclosed")]
         public bool HistoryDisclosed { get; set; }
+        [JsonProperty("inputHint")]
+        public string InputHint{ get; set; }
+        [JsonProperty("suggestedActions")]
+        public SuggestedActions SuggestedActions { get; set; }
 
         public Activity()
         {

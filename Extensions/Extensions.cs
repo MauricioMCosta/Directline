@@ -17,7 +17,8 @@ namespace Directline.Extensions
             {
                 
                 var dProperty = destProps.SingleOrDefault(p => p.Name.Equals(sourceProp.Name) && p.CanWrite);
-
+                if(dProperty==null) continue;
+                if(sourceProp.GetValue(objSource)==null) continue; // skip nulls.
                 dProperty.SetValue(objDestination, sourceProp.GetValue(objSource));
             }
         }
