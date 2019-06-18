@@ -62,7 +62,8 @@ namespace Directline.Controllers
 
         [HttpPost]
         [Route("/directline/conversations")]
-        public async Task<ActionResult> V1CreateConversationAsync()
+        [Route("/v3/directline/conversations")]
+        public async Task<ActionResult> CreateConversationAsync()
         {
             _logger.LogDebug("POST /directline/conversations");
             var conversation = new Conversation() { ConversationId = Guid.NewGuid().ToString() };
@@ -93,9 +94,11 @@ namespace Directline.Controllers
                 return StatusCode(statusCode, new { error = 400, message = "can't connect to bot" });
             }
         }
-        // Sends message to bot. Assumes message activities
+
+        // Sends message to bot client. Assumes message activities
         [HttpGet]
         [Route("/directline/conversations/{conversationId}/activities")]
+        [Route("/v3/directline/conversations/{conversationId}/activities")]
         public ActionResult GetActivity([FromRoute] string conversationId, [FromQuery(Name = "watermark")] string w)
         {
             _logger.LogDebug("GET /directline/conversations/:conversationId/activities");
@@ -122,6 +125,7 @@ namespace Directline.Controllers
         // Sends message to bot. Assumes message activities
         [HttpPost]
         [Route("/directline/conversations/{conversationId}/activities")]
+        [Route("/v3/directline/conversations/{conversationId}/activities")]
         public async Task<ActionResult> PostActivityAsync([FromRoute] string conversationId)
         {
             _logger.LogDebug("POST /directline/conversations/:conversationId/activities");
@@ -173,38 +177,10 @@ namespace Directline.Controllers
             return BadRequest();
         }
 
-        //[HttpPost]
-        //[Route("/v3/directline/conversations")]
-        //public ActionResult V3CreateConversation()
-        //{
-        //    _logger.LogDebug("POST /v3/directline/conversations");
-        //    var conversation = new Conversation() { ConversationId = Guid.NewGuid().ToString() };
-        //
-        //    _datastorage.Conversations.Add(conversation.ConversationId, conversation);
-        //
-        //    var activity = CreateConversationUpdateActivity(conversation.ConversationId);
-        //    // AT THIS POINT I NEED TO FORWARD TO BOT
-        //    var statusCode = 200;
-        //    try
-        //    {
-        //        using (var client = new WebClient())
-        //        {
-        //            client.Headers[HttpRequestHeader.ContentType] = "application/json";
-        //            client.UploadString(GetBotUrl(), JsonConvert.SerializeObject(activity));
-        //        }
-        //    }
-        //    catch (WebException e)
-        //    {
-        //        _logger.LogError($"Can't connect to BOT {GetBotUrl()}", e.StackTrace);
-        //        statusCode = 400;
-        //    }
-        //    var c = new { ConversationId = conversation.ConversationId, ExpiresIn = expiresIn, StatusCode = statusCode };
-        //    return StatusCode(c.StatusCode, c);
-        //}
-
 
         [HttpGet]
         [Route("/directline/conversations/{conversationId}")]
+        [Route("/v3/directline/conversations/{conversationId}")]
         public void V1GetConversation([FromRoute] string conversationId, [FromQuery(Name = "watermark")] string w)
         {
             return;
@@ -219,20 +195,5 @@ namespace Directline.Controllers
             //}
             //return BadRequest();
         }
-
-        //[HttpGet]
-        //[Route("/v3/directline/conversations/{conversationId}")]
-        //public ActionResult V3GetConversation([FromRoute] string conversationId, [FromQuery(Name ="watermark")] string w)
-        //{
-        //    _logger.LogDebug($"GET /v3/directline/conversations/{conversationId}");
-        //    _logger.LogWarning("Route /v3/directline/conversations/{conversationId} not implemented");
-        //    ConversationObject obj;
-        //    Conversation conversation;
-        //    if (_datastorage.Conversations.TryGetValue(conversationId, out conversation))
-        //    {
-        //        return Ok(new ConversationObject() { ConversationId = conversationId, ExpiresIn = expiresIn });
-        //    }
-        //    return BadRequest();
-        //}
     }
 }
