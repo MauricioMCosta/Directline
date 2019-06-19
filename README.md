@@ -15,6 +15,31 @@ For me it's enough for the work I'm developing. :)
 
 > This documentation is not ready yet... See todo below:
 
+## How To...
+
+### ...build
+You can either load the files using Visual Studio 2017/2019 or VSCode. Trigger build from there. Otherwise, you can go command line
+
+```
+dotnet build
+```
+
+### ...run
+
+Via command line:
+
+```
+dotnet run
+```
+
+### ... configure
+
+The most essential configuration is in *applicationconfig.json* Make sure you put a valid bot service in the **BotFramework:Url** property.
+
+## Security
+
+It's on going... by now *Authorization: Bearer ...* doesn't work. So it's free to use.
+
 ## TODO List
 
 - Support to Authorization header
