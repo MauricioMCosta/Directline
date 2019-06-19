@@ -40,59 +40,24 @@ namespace Directline.Controllers
             return Ok();
         }
 
-        //[HttpOptions]
-        //[Route("/directline/conversations/{conversationId}")]
-        //public ActionResult V1OptionsConversation([FromRoute] string conversationId, [FromQuery(Name = "watermark")] string w)
-        //{
-        //    _logger.LogDebug($"OPTIONS /directline/conversations/{conversationId}");
-        //    var watermark = string.IsNullOrEmpty(w) ? 0 : Convert.ToInt32(w);
-        //    return Ok();
-        //}
-
-        //[HttpOptions]
-        //[Route("/v3/directline/conversations/{conversationId}")]
-        //public ActionResult V3OptionsConversation([FromRoute] string conversationId, [FromQuery(Name = "watermark")] string w)
-        //{
-        //    _logger.LogDebug($"OPTIONS /v3/directline/conversations/{conversationId}");
-        //    var watermark = string.IsNullOrEmpty(w) ? 0 : Convert.ToInt32(w);
-        //    return Ok();
-        //}
-
+        
         #endregion
 
         [HttpPost]
         [Route("/directline/conversations")]
         [Route("/v3/directline/conversations")]
-        public async Task<ActionResult> CreateConversationAsync()
+        public ActionResult CreateConversation([FromHeader] string authorization)
         {
             _logger.LogDebug("POST /directline/conversations");
+            _logger.LogInformation($"Authorization secret={authorization}");
+
             var conversation = new Conversation() { ConversationId = Guid.NewGuid().ToString() };
 
             _datastorage.Conversations.Add(conversation.ConversationId, conversation);
 
-            var activity = CreateConversationUpdateActivity(conversation.ConversationId);
-            // AT THIS POINT I NEED TO FORWARD TO BOT
-            var statusCode = 200;
-            try
-            {
-                using (var client = new HttpClient())
-                {
-                    _logger.LogInformation($"Forwarding requests to BOT at {GetBotUrl()}");
-                    client.BaseAddress = new Uri(GetBotUrl());
-                    client.DefaultRequestHeaders.Accept.Clear();
-                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            var c = new ConversationObject() { ConversationId = conversation.ConversationId, ExpiresIn = expiresIn };
+            return StatusCode((int)HttpStatusCode.Created, c);
 
-                    var response = await client.PostAsJsonAsync($"api/messages", activity);
-                    var c = new ConversationObject() { ConversationId = conversation.ConversationId, ExpiresIn = expiresIn };
-                    return StatusCode((int)response.StatusCode, c);
-                }
-            }
-            catch (WebException e)
-            {
-                _logger.LogError($"Can't connect to BOT {GetBotUrl()}", e.StackTrace);
-                statusCode = 400;
-                return StatusCode(statusCode, new { error = 400, message = "can't connect to bot" });
-            }
         }
 
         // Sends message to bot client. Assumes message activities
@@ -181,7 +146,7 @@ namespace Directline.Controllers
         [HttpGet]
         [Route("/directline/conversations/{conversationId}")]
         [Route("/v3/directline/conversations/{conversationId}")]
-        public void V1GetConversation([FromRoute] string conversationId, [FromQuery(Name = "watermark")] string w)
+        public void GetConversation([FromRoute] string conversationId, [FromQuery(Name = "watermark")] string w)
         {
             return;
             ////return BadRequest(new { error = 400, message = "unsupported" });

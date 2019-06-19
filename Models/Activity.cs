@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 
 namespace Directline.Models
 {
@@ -43,9 +44,9 @@ namespace Directline.Models
         [JsonProperty("entities")]
         public Entity[] Entities { get; set; }
         [JsonProperty("membersAdded")]
-        public ChannelAccount[] MembersAdded { get; set; }
+        public List<ChannelAccount> MembersAdded { get; set; }
         [JsonProperty("membersRemoved")]
-        public ChannelAccount[] MembersRemoved { get; set; }
+        public List<ChannelAccount> MembersRemoved { get; set; }
         [JsonProperty("topicName")]
         public string TopicName { get; set; }
         [JsonProperty("historyDisclosed")]
@@ -77,6 +78,8 @@ namespace Directline.Models
         public ConversationUpdateActivity():base()
         {
             Type = "conversationUpdate";
+            MembersAdded = new List<ChannelAccount>();
+            MembersRemoved = new List<ChannelAccount>();
         }
     }
 }

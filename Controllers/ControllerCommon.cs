@@ -64,7 +64,7 @@ namespace Directline.Controllers
                 ServiceUrl = GetServiceUrl(),
                 Conversation = new ConversationAccount { Id = conversationId, IsGroup = false },
                 From = new ChannelAccount { Id = "offline-directline", Name = "Offline Directline Server" }
-            };
+        };
         }
 
         protected string GetBotDataKey(string channelId = "*", string conversationId = "*", string userId = "*")
