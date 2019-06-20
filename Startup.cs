@@ -66,7 +66,11 @@ namespace Directline
                 c.SwaggerEndpoint("/swagger/v1_v3/swagger.json", "DirectlineAPI");
             });
 
-            app.UseMvc();
+            app.UseMvc(routes=> {
+                routes.MapRoute(name: "Ignore", "{*favicon}", new { }, new { favicon = @"(.*[/\\])?favicon\.((ico)|(png))(/.*)?" });
+                routes.MapRoute(name: "default",
+                template:"{controller=Home}/{action=Index}/{id?}");
+            });
         }
     }
 }
