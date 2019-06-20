@@ -67,9 +67,8 @@ namespace Directline
             });
 
             app.UseMvc(routes=> {
-                routes.MapRoute(name: "Ignore", "{*favicon}", new { }, new { favicon = @"(.*[/\\])?favicon\.((ico)|(png))(/.*)?" });
-                routes.MapRoute(name: "default",
-                template:"{controller=Home}/{action=Index}/{id?}");
+                routes.MapRoute("Ignore", "{*favicon}", new { }, new { favicon = @"(.*[/\\])?favicon\.((ico)|(png))(/.*)?" });
+                routes.MapRoute("default","{controller=Home}/{action=Index}/{id?}");
             });
         }
     }
