@@ -8,6 +8,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Directline.Controllers
 {
@@ -96,19 +99,6 @@ namespace Directline.Controllers
             return newState;
         }
 
-        protected BotState SetUserData(string key, BotState state)
-        {
-            return SetBotData(key, state);
-        }
-        protected BotState SetConversationData(string key, BotState state)
-        {
-            return SetBotData(key, state);
-        }
-        protected BotState SetPrivateConversationData(string key, BotState state)
-        {
-            return SetBotData(key, state);
-        }
-
         protected void DeleteStateForUser(string userId)
         {
             var toDelete=_datastorage.BotStates.Where(w => w.Key.EndsWith($"!{userId}")).ToList();
@@ -116,6 +106,27 @@ namespace Directline.Controllers
             {
                 _datastorage.BotStates.Remove(s.Key);
             }
+        }
+
+        private string GenerateJSONWebToken(UserModel userInfo)
+        {
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+            var claims = new[] {
+                new Claim(JwtRegisteredClaimNames.Sub, userInfo.Username),
+                new Claim("Token", userInfo.Token),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
+
+            var token = new JwtSecurityToken(
+                _config["Jwt:Issuer"],
+                _config["Jwt:Issuer"],
+                claims,
+                expires: DateTime.Now.AddMinutes(120),
+                signingCredentials: credentials);
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
 }

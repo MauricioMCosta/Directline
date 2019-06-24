@@ -160,5 +160,14 @@ namespace Directline.Controllers
             //}
             //return BadRequest();
         }
+
+        [HttpPost]
+        [Route("/directline/tokens/generate")]
+        [Route("/v3/directline/tokens/generate")]
+        public async Task GenerateToken([FromBody]UserModel user)
+        {
+
+            
+        } 
     }
 }
