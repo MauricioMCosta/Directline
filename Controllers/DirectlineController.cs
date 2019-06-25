@@ -164,10 +164,10 @@ namespace Directline.Controllers
         [HttpPost]
         [Route("/directline/tokens/generate")]
         [Route("/v3/directline/tokens/generate")]
-        public async Task GenerateToken([FromBody]UserModel user)
+        public ActionResult GenerateToken([FromBody]UserModel user)
         {
 
-            
-        } 
+            return Ok();
+        }
     }
 }

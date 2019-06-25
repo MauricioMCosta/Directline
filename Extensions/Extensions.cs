@@ -1,12 +1,20 @@
-﻿using System;
+﻿using Directline.Services;
+using Microsoft.AspNetCore.Hosting;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.ServiceProcess;
 using System.Threading.Tasks;
 
 namespace Directline.Extensions
 {
     public static class Extensions
     {
+        public static void RunAsCustomService(this IWebHost host)
+        {
+            var webHostService = new CustomWebHostService(host);
+            ServiceBase.Run(webHostService);
+        }
         public static void CopyFrom(this object objDestination, object objSource, string[] skipProperties)
         {
             //get the list of all properties in the destination object
