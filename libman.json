@@ -1,0 +1,27 @@
+{
+  "version": "1.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "library": "angular.js@1.7.8",
+      "destination": "wwwroot/scripts/angular.js/",
+      "files": [
+        "angular.min.js",
+        "angular-animate.min.js",
+        "angular-aria.min.js",
+        "angular-message-format.min.js",
+        "angular-messages.min.js",
+        "angular-sanitize.min.js",
+        "angular-touch.min.js"
+      ]
+    },
+    {
+      "library": "angular-material@1.1.19",
+      "destination": "wwwroot/scripts/angular-material/",
+      "files": [
+        "angular-material.min.css",
+        "angular-material.min.js"
+      ]
+    }
+  ]
+}
