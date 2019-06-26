@@ -105,10 +105,10 @@ namespace Directline.Controllers
             var activity = new MessageActivity()
             {
                 ServiceUrl = GetServiceUrl(),
-                ChannelId = "emulator",
+                ChannelId="emulator",
                 Conversation = new ConversationAccount() { Id = conversationId }
             };
-            activity.CopyFrom(incomingActivity, new string[] { "Id", "Timestamp", "LocalTimestamp", "ServiceUrl", "ChannelId", "Conversation" });
+            activity.CopyFrom(incomingActivity, new string[] { "Id", "Timestamp", "LocalTimestamp", "ServiceUrl", "Conversation" });
 
             var conversation = GetConversation(conversationId);
             if (conversation != null)

@@ -9,7 +9,7 @@ namespace Directline.Models
         [JsonProperty("contentUrl")]
         public string ContentUrl { get; set; }
         [JsonProperty("content")]
-        public byte[] Content { get; set; }
+        public object Content { get; set; }
         [JsonProperty("name")]
         public string Name { get; set; }
         [JsonProperty("thumbnailUrl")]
