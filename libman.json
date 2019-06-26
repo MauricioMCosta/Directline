@@ -22,6 +22,10 @@
         "angular-material.min.css",
         "angular-material.min.js"
       ]
+    },
+    {
+      "library": "font-awesome@5.8.2",
+      "destination": "wwwroot/scripts/font-awesome/"
     }
   ]
 }
