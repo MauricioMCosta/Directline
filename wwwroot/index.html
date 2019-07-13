@@ -3,12 +3,11 @@
 <head>
     <meta charset="utf-8" />
     <title>Directline API</title>
-
 </head>
 <body ng-app="directlineApp" ng-controller="AppController" ng-cloak>
     <div layout="column" layout-fill="">
         <md-toolbar layout="row" class="md-toolbar-tools">
-            <md-button class="menu md-icon-button"  ng-click="toggleMenu()" aria-label="Show Menu">
+            <md-button class="menu md-icon-button" ng-click="toggleMenu()" aria-label="Show Menu">
                 <md-icon md-font-icon="fas fa-globe"></md-icon>
             </md-button>
             <h1>DirectLine API</h1>
@@ -17,9 +16,11 @@
             <md-sidenav class="md-whiteframe-4dp" md-is-locked-open="$mdMedia('gt-sm')" md-component-id="left" ng-click="toggleMenu()">
                 <md-list>
                     <md-list-item ng-repeat="page in pages">
-                        <md-button ng-href="#{{page.url}}" ng-click="$mdSidenav('left').toggle()" flex>
+
+                        <md-button ng-href="#!/{{page.url}}" ng-click="$mdSidenav('left').toggle()">
                             <md-icon md-font-icon="{{page.icon}}"></md-icon>{{page.name}}
                         </md-button>
+
                     </md-list-item>
                 </md-list>
             </md-sidenav>
@@ -38,8 +39,10 @@
     <script type="text/javascript" src="scripts/font-awesome/js/fontawesome.min.js"></script>
 
     <link rel="stylesheet" href="scripts/angular-material/angular-material.min.css" />
-    <link rel="stylesheet" href="scripts/font-awesome/css/all.min.css"/>
+    <link rel="stylesheet" href="scripts/font-awesome/css/all.min.css" />
 
     <script type="text/javascript" src="scripts/directline/app.js"></script>
+    <script type="text/javascript" src="scripts/directline/homeController.js"></script>
+    <script type="text/javascript" src="scripts/directline/tokengenController.js"></script>
 </body>
 </html>

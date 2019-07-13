@@ -13,7 +13,7 @@ namespace Directline
     {
         public static void Main(string[] args)
         {
-            var isService = !(Debugger.IsAttached || args.Contains("--console"));
+            var isService = !Debugger.IsAttached && args.Contains("--service");
 
             if (isService)
             {
@@ -22,7 +22,7 @@ namespace Directline
                 Directory.SetCurrentDirectory(pathToContentRoot);
             }
 
-            var builder = CreateWebHostBuilder(args.Where(arg => arg != "--console").ToArray());
+            var builder = CreateWebHostBuilder(args.Where(arg => arg != "--service").ToArray());
             var host = builder.Build();
             
             if(isService) {
@@ -35,7 +35,7 @@ namespace Directline
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .ConfigureLogging((hostingContext, logging)=> {
-                    logging.AddEventLog();
+                    logging.AddConsole();
                 })
                 .UseStartup<Startup>()
             .ConfigureLogging(options=> { options.AddConsole(); });

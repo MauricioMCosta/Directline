@@ -1,0 +1,40 @@
+<md-card>
+    <md-card-header>
+        <h2 class="md-title">Token Generation</h2>
+    </md-card-header>
+    <md-card-content>
+        <form name="tokenGenForm" layout="column" kayout-align="start start" flex="nogrow">
+            <md-input-container>
+                <label>BOT Service URL</label>
+                <input type="url" placeholder="http://yourserver:port/api/messages" name="botServiceUrl" ng-model="ctl.botServiceUrl" 
+                       required="required" />
+                <div ng-messages="tokenGenForm.botServiceUrl.$error" ng-show="tokenGenForm.botServiceUrl.$dirty">
+                    <div ng-message="required">This is required!</div>
+                    <div ng-message="url">It should be a valid URL!</div>
+                </div>
+            </md-input-container>
+            <md-input-container>
+                <label>BOT User name</label>
+                <input type="text" placeholder="Username" name="botUsername" ng-model="ctl.botUsername"/>
+            </md-input-container>
+            <md-input-container>
+                <label>BOT Password</label>
+                <input type="password" placeholder="password" name="botPassword" ng-model="ctl.botUsername"/>
+            </md-input-container>
+            <md-input-container layout="row">
+                <md-button class="md-primary md-raised" ng-click="ctl.generateToken()">Generate Token!</md-button>
+                <md-button class="md-secondary md-raised" ng-click="ctl.generateToken()">Clear</md-button>
+            </md-input-container>
+        </form>
+    </md-card-content>
+</md-card>
+<md-card ng-show="ctl.token!=null">
+    <md-card-header>
+        <h2 class="md-title">Token</h2>
+    </md-card-header>
+    <md-card-content>
+        <code>
+            {{ctl.token}}
+        </code>
+    </md-card-content>
+</md-card>
