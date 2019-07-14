@@ -13,6 +13,9 @@ using Microsoft.Extensions.Configuration;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.IO;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace Directline.Controllers
 {
@@ -164,9 +167,22 @@ namespace Directline.Controllers
         [HttpPost]
         [Route("/directline/tokens/generate")]
         [Route("/v3/directline/tokens/generate")]
+        [Authorize(AuthenticationSchemes =JwtBearerDefaults.AuthenticationScheme)]
         public ActionResult GenerateToken([FromBody]UserModel user)
         {
+            // the magic here is to get the claims from the initial Authentication token
+            // based on that just generate a temporary token with proper expiration
 
+            // NOT FINISHED! Just keeping this code as future reference.
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            if (identity != null)
+            {
+                IEnumerable<Claim> claims = identity.Claims;
+                // or
+            //    identity.FindFirst("ClaimName").Value;
+
+            }
+            //GenerateJSONWebToken()
             return Ok();
         }
     }

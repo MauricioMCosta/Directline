@@ -19,20 +19,20 @@ namespace Directline.Controllers
     {
         public const int expiresIn = 1800;
         public readonly IDataStorage _datastorage;
-        private bool conversationInitRequired=true;
+        private bool conversationInitRequired = true;
         private readonly IConfiguration _config;
         private readonly IHttpContextAccessor _httpContext;
 
         public ControllerCommon(IHttpContextAccessor httpContext, IConfiguration config, IDataStorage datastorage)
         {
-            _httpContext=httpContext;
+            _httpContext = httpContext;
             _datastorage = datastorage;
             _config = config;
         }
 
         protected string GetBotUrl()
         {
-            var url= _config["BotFramework:Url"];
+            var url = _config["BotFramework:Url"];
             if (url == null)
                 throw new ArgumentNullException("Url", "Parameter BotFramework:Url in Configuration file can't be null");
             return url;
@@ -52,12 +52,12 @@ namespace Directline.Controllers
         protected Conversation GetConversation(string conversationId)
         {
             Conversation conversation;
-            if (!_datastorage.Conversations.TryGetValue(conversationId, out conversation)&&!conversationInitRequired)
+            if (!_datastorage.Conversations.TryGetValue(conversationId, out conversation) && !conversationInitRequired)
             {
                 conversation = new Conversation() { ConversationId = conversationId };
                 _datastorage.Conversations.Add(conversationId, conversation);
             }
-            
+
             return conversation;
         }
         protected Activity CreateConversationUpdateActivity(string conversationId)
@@ -68,7 +68,7 @@ namespace Directline.Controllers
                 ServiceUrl = GetServiceUrl(),
                 Conversation = new ConversationAccount { Id = conversationId, IsGroup = false },
                 From = new ChannelAccount { Id = "offline-directline", Name = "Offline Directline Server" }
-        };
+            };
         }
 
         protected string GetBotDataKey(string channelId = "*", string conversationId = "*", string userId = "*")
@@ -88,11 +88,13 @@ namespace Directline.Controllers
                 ETag = DateTime.Now.ToString("o"),
                 Data = oldState?.Data
             };
-            
-            if(oldState!=null)
+
+            if (oldState != null)
             {
                 _datastorage.BotStates[key] = newState;
-            } else {
+            }
+            else
+            {
                 _datastorage.BotStates.Remove(key);
                 newState.ETag = "*";
             }
@@ -102,29 +104,36 @@ namespace Directline.Controllers
 
         protected void DeleteStateForUser(string userId)
         {
-            var toDelete=_datastorage.BotStates.Where(w => w.Key.EndsWith($"!{userId}")).ToList();
-            foreach(var s in toDelete)
+            var toDelete = _datastorage.BotStates.Where(w => w.Key.EndsWith($"!{userId}")).ToList();
+            foreach (var s in toDelete)
             {
                 _datastorage.BotStates.Remove(s.Key);
             }
         }
 
-        private string GenerateJSONWebToken(UserModel userInfo)
+        protected string GenerateJSONWebToken(UserModel userInfo)
+        {
+            var claims = new[] {
+                new Claim(JwtRegisteredClaimNames.Sub, userInfo.Username),
+                new Claim("Token", userInfo.Token)
+            };
+            
+            return GenerateJSONWebToken(claims, expires:DateTime.Now.AddMinutes(120));            
+        }
+        protected string GenerateJSONWebToken(IEnumerable<Claim> claims, DateTime? expires)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-            var claims = new[] {
-                new Claim(JwtRegisteredClaimNames.Sub, userInfo.Username),
-                new Claim("Token", userInfo.Token),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-            };
+            List<Claim> cl = new List<Claim>();
+            cl.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
+            cl.AddRange(claims);
 
             var token = new JwtSecurityToken(
                 _config["Jwt:Issuer"],
                 _config["Jwt:Issuer"],
-                claims,
-                expires: DateTime.Now.AddMinutes(120),
+                cl.ToArray(),
+                expires: expires,
                 signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);

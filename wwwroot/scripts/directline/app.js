@@ -35,6 +35,11 @@
                             return $location('/swagger');
                         }
                     })
+                    .when('/stats', {
+                        templateUrl: 'pages/statistics.html',
+                        controller: 'StatisticsCtl',
+                        controllerAs: 'ctl'
+                    })
                     .when('/about', {
                         templateUrl: "pages/about.html"
                     })
@@ -42,7 +47,7 @@
                         template: '<h1>testlasdjfçalsdkjfçalkdfjaçlsdkfjaçsldkfjaçsdlkfjaçsldfkjaçsldkfjaçlsdkfjçalsdkfjaçsldkfj</h1>'
                     });
 
-        })
+            })
         .run([
             '$rootScope',
             function ($rootScope) {
@@ -57,8 +62,30 @@
                 });
             }
         ])
-
-        .controller("AppController", function ($scope, $mdSidenav) {
+        .service('directlineAPI', function ($http) {
+            // generateSecret returns a promise to the api/secret call. 
+            this.generateSecret = function (botServiceUrl, botUsername, botPassword) {
+                return $http({
+                    url: '/api/secret',
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    data: { Url: botServiceUrl, Username: botUsername, Password: botPassword }
+                });
+            };
+            // bring from API controller the Statistics for this service 
+            this.statistics = function () {
+                return $http({
+                    url: '/api/statistics',
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+            }; 
+        })
+        .controller("AppController", function ($scope, $mdSidenav, directlineAPI) {
             $scope.toggleMenu = function toggleMenu() {
                 $mdSidenav('left').toggle();
             };
@@ -67,5 +94,10 @@
                 { icon: "fas fa-link", name: "API Primitives", url: "swagger" },
                 { icon: "fas fa-info", name: "About", url: "about" }
             ];
+            $scope.statistics = function () {
+                directlineAPI.statistics().then(function (data) {
+
+                });
+            };
         });
 })(angular);

@@ -25,16 +25,11 @@
                 <md-button class="md-primary md-raised" ng-click="ctl.generateToken()">Generate Token!</md-button>
                 <md-button class="md-secondary md-raised" ng-click="ctl.generateToken()">Clear</md-button>
             </md-input-container>
+            <md-input-container ng-show="ctl.token!=null" class="md-block">
+                <label>Generated Secret</label>
+                <textarea ng-model="ctl.token" rows="5" md-select-on-focus=""></textarea>
+                <p>The code above is the generated secret for your bot client to interact through this DirectLine API. Configure the Skype2DirectLine agent or the WebChat agent with this token in its proper <i>appsetings.json</i> section. Keep it safe! Do not allow unhautorized clients to use it without your control</i></p>
+            </md-input-container>
         </form>
-    </md-card-content>
-</md-card>
-<md-card ng-show="ctl.token!=null">
-    <md-card-header>
-        <h2 class="md-title">Token</h2>
-    </md-card-header>
-    <md-card-content>
-        <code>
-            {{ctl.token}}
-        </code>
     </md-card-content>
 </md-card>
