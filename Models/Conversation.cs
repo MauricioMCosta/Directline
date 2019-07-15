@@ -15,6 +15,8 @@ namespace Directline.Models
     {
         [JsonProperty("conversationId")]
         public string ConversationId { get; set; }
+        [JsonProperty("botEndpoint")]
+        public BotData BotEndpoint { get; set; }
         [JsonProperty("history")]
         public List<Activity> History { get; set; }
 

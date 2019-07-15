@@ -27,8 +27,8 @@ namespace Directline.Controllers
 
         public DirectlineController(
             IHttpContextAccessor httpContext,
-            ILogger<DirectlineController> logger, 
-            IConfiguration config, 
+            ILogger<DirectlineController> logger,
+            IConfiguration config,
             IDataStorage storage) : base(httpContext, config, storage)
         {
             _logger = logger;
@@ -43,18 +43,29 @@ namespace Directline.Controllers
             return Ok();
         }
 
-        
+
         #endregion
 
         [HttpPost]
         [Route("/directline/conversations")]
         [Route("/v3/directline/conversations")]
-        public ActionResult CreateConversation([FromHeader] string authorization)
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public ActionResult CreateConversation()
         {
             _logger.LogDebug("POST /directline/conversations");
-            _logger.LogInformation($"Authorization secret={authorization}");
 
-            var conversation = new Conversation() { ConversationId = Guid.NewGuid().ToString() };
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            IEnumerable<Claim> claims = identity?.Claims;
+
+            var conversation = new Conversation() {
+                ConversationId = Guid.NewGuid().ToString(),
+                BotEndpoint=new BotData()
+                {
+                    Url=claims?.FirstOrDefault(w=>w.Type.Equals("bot.serviceUrl"))?.Value,
+                    Password= claims?.FirstOrDefault(w => w.Type.Equals("bot.password"))?.Value,
+                    Username=claims?.FirstOrDefault(w => w.Type.Equals("bot.username"))?.Value
+                }
+            };
 
             _datastorage.Conversations.Add(conversation.ConversationId, conversation);
 
@@ -67,10 +78,12 @@ namespace Directline.Controllers
         [HttpGet]
         [Route("/directline/conversations/{conversationId}/activities")]
         [Route("/v3/directline/conversations/{conversationId}/activities")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+
         public ActionResult GetActivity([FromRoute] string conversationId, [FromQuery(Name = "watermark")] string w)
         {
             _logger.LogDebug("GET /directline/conversations/:conversationId/activities");
-            _logger.LogInformation("Retrieving a message activity");
+
             var watermark = string.IsNullOrEmpty(w) ? 0 : Convert.ToInt32(w);
             Conversation conversation;
 
@@ -78,7 +91,7 @@ namespace Directline.Controllers
             {
                 if (conversation.History.Count > watermark)
                 {
-                    
+
                     var activities = conversation.History.Skip(watermark).ToArray();
                     return Ok(new { activities = activities, watermark = watermark + activities.Length });
                 }
@@ -94,27 +107,29 @@ namespace Directline.Controllers
         [HttpPost]
         [Route("/directline/conversations/{conversationId}/activities")]
         [Route("/v3/directline/conversations/{conversationId}/activities")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult> PostActivityAsync([FromRoute] string conversationId)
         {
             _logger.LogDebug("POST /directline/conversations/:conversationId/activities");
-            _logger.LogInformation("Creating a message activity");
+
             Activity incomingActivity;
             using (var reader = new StreamReader(Request.Body))
             {
                 var body = reader.ReadToEnd();
                 incomingActivity = JsonConvert.DeserializeObject<Activity>(body);
             }
-                
+
             var activity = new MessageActivity()
             {
                 ServiceUrl = GetServiceUrl(),
-                ChannelId="emulator",
+                ChannelId = "emulator",
                 Conversation = new ConversationAccount() { Id = conversationId }
             };
             activity.CopyFrom(incomingActivity, new string[] { "Id", "Timestamp", "LocalTimestamp", "ServiceUrl", "Conversation" });
 
             var conversation = GetConversation(conversationId);
-            if (conversation != null)
+             
+            if (conversation?.BotEndpoint?.Url != null)
             {
                 conversation.History.Add(activity);
                 // --> Send to BOT!
@@ -123,32 +138,32 @@ namespace Directline.Controllers
                 {
                     using (var client = new HttpClient())
                     {
-                        client.BaseAddress = new Uri(GetBotUrl());
+                        //client.BaseAddress = new Uri(conversation.BotEndpoint.Url);
                         client.DefaultRequestHeaders.Accept.Clear();
                         client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                        var response = await client.PostAsJsonAsync($"api/messages", activity);
+                        var response = await client.PostAsJsonAsync(conversation.BotEndpoint.Url, activity);
                         var c = new ConversationObject() { ConversationId = conversation.ConversationId, ExpiresIn = expiresIn };
                         return StatusCode((int)response.StatusCode, c);
                     }
                 }
                 catch (WebException e)
                 {
-                    _logger.LogError($"Can't connect to BOT {GetBotUrl()}", e.StackTrace);
+                    _logger.LogError($"Can't connect to BOT {conversation.BotEndpoint.Url}", e.StackTrace);
                     statusCode = 400;
-                    return StatusCode(statusCode, new { error = 400, message = "can't connect to bot" });
+                    return StatusCode(statusCode, new { error = 400, message = $"can't connect to bot {conversation.BotEndpoint.Url}" });
                 }
 
             }
             // conversation never was initiated
-            _logger.LogError("Conversation was not initiated");
+            _logger.LogError("Conversation or BOT endpoint is null... Initialize or check endpoints in token");
             return BadRequest();
         }
-
 
         [HttpGet]
         [Route("/directline/conversations/{conversationId}")]
         [Route("/v3/directline/conversations/{conversationId}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public void GetConversation([FromRoute] string conversationId, [FromQuery(Name = "watermark")] string w)
         {
             return;
@@ -167,19 +182,20 @@ namespace Directline.Controllers
         [HttpPost]
         [Route("/directline/tokens/generate")]
         [Route("/v3/directline/tokens/generate")]
-        [Authorize(AuthenticationSchemes =JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public ActionResult GenerateToken([FromBody]UserModel user)
         {
             // the magic here is to get the claims from the initial Authentication token
             // based on that just generate a temporary token with proper expiration
 
             // NOT FINISHED! Just keeping this code as future reference.
+
             var identity = HttpContext.User.Identity as ClaimsIdentity;
             if (identity != null)
             {
                 IEnumerable<Claim> claims = identity.Claims;
                 // or
-            //    identity.FindFirst("ClaimName").Value;
+                //    identity.FindFirst("ClaimName").Value;
 
             }
             //GenerateJSONWebToken()

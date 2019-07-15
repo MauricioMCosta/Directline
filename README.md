@@ -34,18 +34,52 @@ dotnet run
 
 ### ... configure
 
-The most essential configuration is in *applicationconfig.json* Make sure you put a valid bot service in the **BotFramework:Url** property.
+The most essential configuration is in *applicationconfig.json*. There's no much parameter to be configured there. See here a sample:
+```
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Debug"
+    }
+  },
+  "AllowedHosts": "*",
+  "Jwt": {
+    "Key": "ThisismySecretKey",
+    "Issuer": "dell.com"
+  }
+}
+```
+
+Define logging level either *Debug*, *Information*, *Warning* or *Error*. This allows the generation of fewer or more detailed messages during the execution of the engine.
+
+The Jwt stuff see security section.
 
 ## Security
 
-It's on going... by now *Authorization: Bearer ...* doesn't work. So it's free to use.
+It relies on *Authorization: Bearer ...* header and uses JWT (JavaWebToken) to authenticate the client.
+
+### Server Configuration
+
+Just configure the *Key* and *Issuer* entries. The key can be anything. just pick a random string and put there. It is used to generate a hash and sign the JWT Token. All tokens generated before a change on key will be invalidated. Keep this file safe.
+
+### Client Configuration
+
+The clients which will connect to this service, most of them will be Either SkypeToDirecline or any other implementation of WebChat or ChatBot Client which follows the Microsoft's BotFramewor. Go to the UI of Directline
+
+*http://the_server_of_directline:port/index.html*
+
+Go in Generate Token, and fulfill the parameters there.
+
+- Bot URL is the endpoint of the BOT Service (afaik, it shoud end with /api/messages)
+- Bot Password and Username are optional and is not being used at moment. (In the future it will)
+
+Take the token generated and configure in every client which will interact with the directline (Except BOT Service).
 
 ## TODO List
 
-- Support to Authorization header
-- User identification at skype or webchat client.
-- Enhance messaging to support streams, add and remove users
-- Better management for Channel, Conversation and Activity.
+- User identification at webchat client.
+- Implement websocket
+- Remove expired conversations
 - Keep writing the documentation ! :)
 
 # Disclaimer

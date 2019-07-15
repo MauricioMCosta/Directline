@@ -30,13 +30,6 @@ namespace Directline.Controllers
             _config = config;
         }
 
-        protected string GetBotUrl()
-        {
-            var url = _config["BotFramework:Url"];
-            if (url == null)
-                throw new ArgumentNullException("Url", "Parameter BotFramework:Url in Configuration file can't be null");
-            return url;
-        }
         protected string GetServiceUrl()
         {
             var request = _httpContext.HttpContext.Request;
