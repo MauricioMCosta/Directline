@@ -35,7 +35,7 @@ namespace Directline.Controllers
             var request = _httpContext.HttpContext.Request;
 
             var absoluteUri = string.Concat(
-                        request.Scheme,
+                        "https",//request.Scheme,
                         "://",
                         request.Host.ToUriComponent(),
                         request.PathBase.ToUriComponent());

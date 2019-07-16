@@ -146,12 +146,13 @@ namespace Directline.Controllers
                         var c = new ConversationObject() { ConversationId = conversation.ConversationId, ExpiresIn = expiresIn };
                         return StatusCode((int)response.StatusCode, c);
                     }
-                }
-                catch (WebException e)
+                }                
+                catch (Exception e)
                 {
                     _logger.LogError($"Can't connect to BOT {conversation.BotEndpoint.Url}", e.StackTrace);
                     statusCode = 400;
                     return StatusCode(statusCode, new { error = 400, message = $"can't connect to bot {conversation.BotEndpoint.Url}" });
+
                 }
 
             }
